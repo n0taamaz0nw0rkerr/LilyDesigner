@@ -18,15 +18,102 @@
             color: #333;
         }
 
-        .container {
+        /* Device Selection Screen */
+        .device-selection {
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .selection-title {
+            color: white;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .selection-subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .device-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .device-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .device-preview {
+            width: 200px;
+            height: 120px;
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            margin: 0 auto 20px;
+            position: relative;
+            border: 3px solid #1a1a1a;
+        }
+
+        .device-preview::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            background: #000;
+            border-radius: 8px;
+        }
+
+        .device-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .device-specs {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        /* Main Application */
+        .container {
+            display: none;
             height: 100vh;
             gap: 20px;
             padding: 20px;
         }
 
+        .container.active {
+            display: flex;
+        }
+
         .sidebar {
-            width: 300px;
+            width: 320px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             padding: 20px;
@@ -42,6 +129,34 @@
             gap: 20px;
         }
 
+        .mode-selector {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .mode-btn {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            transform: scale(1.05);
+        }
+
         .device-container {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
@@ -54,9 +169,21 @@
             flex: 1;
         }
 
+        .code-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            flex: 1;
+            display: none;
+        }
+
+        .code-container.active {
+            display: block;
+        }
+
         .lilygo-device {
-            width: 400px;
-            height: 300px;
             background: linear-gradient(145deg, #2c3e50, #34495e);
             border-radius: 20px;
             padding: 25px;
@@ -67,8 +194,6 @@
         }
 
         .device-screen {
-            width: 100%;
-            height: 100%;
             background: #000;
             border-radius: 10px;
             position: relative;
@@ -200,14 +325,6 @@
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .element-item:active {
-            transform: translateY(0);
-        }
-
-        .properties-panel {
-            margin-top: 20px;
-        }
-
         .property-group {
             margin-bottom: 20px;
         }
@@ -322,17 +439,23 @@
             box-shadow: 0 0 10px #00ff88;
         }
 
-        .code-preview {
+        .code-editor {
             background: #1e1e1e;
             color: #d4d4d4;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             font-family: 'Courier New', monospace;
-            font-size: 11px;
-            max-height: 200px;
+            font-size: 12px;
+            height: 100%;
             overflow-y: auto;
-            margin-top: 20px;
             border: 1px solid #333;
+            white-space: pre-wrap;
+        }
+
+        .code-toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
         .toast {
@@ -354,10 +477,124 @@
             opacity: 1;
             transform: translateX(0);
         }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Device-specific styles */
+        .device-t-display {
+            width: 400px;
+            height: 300px;
+        }
+
+        .device-t-display .device-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        .device-t-display-s3 {
+            width: 450px;
+            height: 320px;
+        }
+
+        .device-t-display-s3 .device-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        .device-esp32-c3 {
+            width: 350px;
+            height: 250px;
+        }
+
+        .device-esp32-c3 .device-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        .device-t-embed {
+            width: 300px;
+            height: 200px;
+        }
+
+        .device-t-embed .device-screen {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Device Selection Screen -->
+    <div class="device-selection" id="deviceSelection">
+        <h1 class="selection-title">🚀 LilyGo UI Creator</h1>
+        <p class="selection-subtitle">Choose your device to get started</p>
+        
+        <div class="device-grid">
+            <div class="device-card" onclick="selectDevice('t-display', 'LILYGO T-Display', 400, 300)">
+                <div class="device-preview"></div>
+                <h3 class="device-name">T-Display</h3>
+                <p class="device-specs">
+                    Resolution: 135×240<br>
+                    ESP32 + ST7789<br>
+                    1.14" IPS Display
+                </p>
+            </div>
+
+            <div class="device-card" onclick="selectDevice('t-display-s3', 'LILYGO T-Display-S3', 450, 320)">
+                <div class="device-preview"></div>
+                <h3 class="device-name">T-Display-S3</h3>
+                <p class="device-specs">
+                    Resolution: 170×320<br>
+                    ESP32-S3 + ST7789<br>
+                    1.9" IPS Display
+                </p>
+            </div>
+
+            <div class="device-card" onclick="selectDevice('esp32-c3', 'ESP32-C3 Mini', 350, 250)">
+                <div class="device-preview"></div>
+                <h3 class="device-name">ESP32-C3 Mini</h3>
+                <p class="device-specs">
+                    Resolution: 128×128<br>
+                    ESP32-C3 + SSD1306<br>
+                    0.96" OLED Display
+                </p>
+            </div>
+
+            <div class="device-card" onclick="selectDevice('t-embed', 'T-Embed', 300, 200)">
+                <div class="device-preview"></div>
+                <h3 class="device-name">T-Embed</h3>
+                <p class="device-specs">
+                    Resolution: 170×320<br>
+                    ESP32-S3 + ST7789<br>
+                    Rotary Encoder
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <button class="back-btn" onclick="showDeviceSelection()" style="display: none;" id="backBtn">← Back to Devices</button>
+    
+    <div class="container" id="mainApp">
         <div class="sidebar">
             <h2>🎨 UI Elements</h2>
             <div class="element-list">
@@ -365,23 +602,27 @@
                 <button class="element-item" onclick="addElement('text')">📝 Text</button>
                 <button class="element-item" onclick="addElement('slider')">🎚️ Slider</button>
                 <button class="element-item" onclick="addElement('progress')">📊 Progress Bar</button>
+                <button class="element-item" onclick="addElement('icon')">🎯 Icon</button>
+                <button class="element-item" onclick="addElement('image')">🖼️ Image</button>
             </div>
 
             <div class="properties-panel" id="propertiesPanel">
                 <h2>⚙️ Properties</h2>
                 <p style="color: #666; font-size: 12px;">Select an element to edit its properties</p>
             </div>
-
-            <div class="code-preview" id="codePreview">
-                <div style="color: #569cd6;">// Generated Code Preview</div>
-                <div style="color: #6a9955;">// Add elements to see generated code</div>
-            </div>
         </div>
 
         <div class="main-content">
-            <div class="device-container">
-                <div class="lilygo-device">
-                    <div class="device-info">LILYGO T-Display</div>
+            <div class="mode-selector">
+                <span style="color: #2c3e50; font-weight: bold;">Mode:</span>
+                <button class="mode-btn active" id="blockMode" onclick="setMode('block')">🧩 Block Mode</button>
+                <button class="mode-btn" id="codeMode" onclick="setMode('code')">💻 Code Mode</button>
+                <span style="color: #666; margin-left: auto; font-size: 12px;" id="deviceLabel">Device: T-Display</span>
+            </div>
+
+            <div class="device-container" id="blockContainer">
+                <div class="lilygo-device device-t-display" id="deviceSimulator">
+                    <div class="device-info" id="deviceInfo">LILYGO T-Display</div>
                     <div class="device-led"></div>
                     <div class="device-screen">
                         <div class="screen-content" id="screenContent">
@@ -391,12 +632,21 @@
                 </div>
             </div>
 
+            <div class="code-container" id="codeContainer">
+                <div class="code-toolbar">
+                    <button class="control-btn export" onclick="exportCode()">💾 Export .ino</button>
+                    <button class="control-btn" onclick="copyCode()">📋 Copy Code</button>
+                    <button class="control-btn" onclick="formatCode()">✨ Format</button>
+                </div>
+                <div class="code-editor" id="codeEditor"></div>
+            </div>
+
             <div class="controls">
                 <div class="control-buttons">
-                    <button class="control-btn export" onclick="exportCode()">💾 Export Code</button>
-                    <button class="control-btn clear" onclick="clearScreen()">🗑️ Clear Screen</button>
+                    <button class="control-btn clear" onclick="clearScreen()">🗑️ Clear All</button>
                     <button class="control-btn" onclick="toggleGrid()">⊞ Toggle Grid</button>
                     <button class="control-btn" onclick="previewMode()">👁️ Preview</button>
+                    <button class="control-btn" onclick="randomLayout()">🎲 Random</button>
                 </div>
             </div>
         </div>
@@ -410,12 +660,67 @@
         let isDragging = false;
         let dragOffset = { x: 0, y: 0 };
         let gridVisible = true;
+        let currentMode = 'block';
+        let currentDevice = {
+            type: 't-display',
+            name: 'LILYGO T-Display',
+            width: 400,
+            height: 300,
+            resolution: { width: 135, height: 240 }
+        };
+
+        const deviceConfigs = {
+            't-display': { resolution: { width: 135, height: 240 }, library: 'TFT_eSPI' },
+            't-display-s3': { resolution: { width: 170, height: 320 }, library: 'TFT_eSPI' },
+            'esp32-c3': { resolution: { width: 128, height: 128 }, library: 'U8g2lib' },
+            't-embed': { resolution: { width: 170, height: 320 }, library: 'TFT_eSPI' }
+        };
 
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function selectDevice(type, name, width, height) {
+            currentDevice = { type, name, width, height, ...deviceConfigs[type] };
+            
+            document.getElementById('deviceSelection').style.display = 'none';
+            document.getElementById('mainApp').classList.add('active');
+            document.getElementById('backBtn').style.display = 'block';
+            document.getElementById('deviceLabel').textContent = `Device: ${name}`;
+            document.getElementById('deviceInfo').textContent = name;
+            
+            // Update device simulator
+            const simulator = document.getElementById('deviceSimulator');
+            simulator.className = `lilygo-device device-${type}`;
+            simulator.style.width = width + 'px';
+            simulator.style.height = height + 'px';
+            
+            updateCodePreview();
+            showToast(`${name} selected! Ready to design! 🚀`);
+        }
+
+        function showDeviceSelection() {
+            document.getElementById('deviceSelection').style.display = 'flex';
+            document.getElementById('mainApp').classList.remove('active');
+            document.getElementById('backBtn').style.display = 'none';
+            clearScreen(false);
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('blockMode').classList.toggle('active', mode === 'block');
+            document.getElementById('codeMode').classList.toggle('active', mode === 'code');
+            document.getElementById('blockContainer').style.display = mode === 'block' ? 'flex' : 'none';
+            document.getElementById('codeContainer').classList.toggle('active', mode === 'code');
+            
+            if (mode === 'code') {
+                updateCodePreview();
+            }
+            
+            showToast(`${mode === 'block' ? 'Block' : 'Code'} mode activated`);
         }
 
         function addElement(type) {
@@ -455,6 +760,31 @@
                     element.dataset.value = '60';
                     element.dataset.color = '#00ff88';
                     break;
+                case 'icon':
+                    element.innerHTML = '🎯';
+                    element.dataset.icon = '🎯';
+                    element.dataset.size = '24';
+                    element.style.fontSize = '24px';
+                    element.style.textAlign = 'center';
+                    element.style.width = '32px';
+                    element.style.height = '32px';
+                    element.style.display = 'flex';
+                    element.style.alignItems = 'center';
+                    element.style.justifyContent = 'center';
+                    break;
+                case 'image':
+                    element.innerHTML = '🖼️';
+                    element.dataset.src = 'image.png';
+                    element.dataset.width = '64';
+                    element.dataset.height = '64';
+                    element.style.width = '64px';
+                    element.style.height = '64px';
+                    element.style.background = 'rgba(255,255,255,0.2)';
+                    element.style.display = 'flex';
+                    element.style.alignItems = 'center';
+                    element.style.justifyContent = 'center';
+                    element.style.fontSize = '32px';
+                    break;
             }
 
             element.addEventListener('mousedown', startDrag);
@@ -471,7 +801,6 @@
                 isDragging = true;
                 selectedElement = e.target;
                 const rect = selectedElement.getBoundingClientRect();
-                const screenRect = document.getElementById('screenContent').getBoundingClientRect();
                 dragOffset.x = e.clientX - rect.left;
                 dragOffset.y = e.clientY - rect.top;
                 
@@ -487,7 +816,6 @@
                 let x = e.clientX - screenRect.left - dragOffset.x;
                 let y = e.clientY - screenRect.top - dragOffset.y;
                 
-                // Constrain to screen bounds
                 x = Math.max(0, Math.min(x, screenRect.width - selectedElement.offsetWidth));
                 y = Math.max(0, Math.min(y, screenRect.height - selectedElement.offsetHeight));
                 
@@ -506,7 +834,6 @@
         function selectElement(e) {
             if (isDragging) return;
             
-            // Remove previous selection
             document.querySelectorAll('.ui-element').forEach(el => el.classList.remove('selected'));
             
             if (e.target.classList.contains('ui-element')) {
@@ -549,7 +876,7 @@
                         </div>
                         <div class="property-group">
                             <label>Size</label>
-                            <input type="range" min="8" max="24" value="${selectedElement.dataset.size || '14'}" onchange="updateProperty('size', this.value)">
+                            <input type="range" min="8" max="32" value="${selectedElement.dataset.size || '14'}" onchange="updateProperty('size', this.value)">
                         </div>
                     `;
                     break;
@@ -574,6 +901,34 @@
                         <div class="property-group">
                             <label>Color</label>
                             <input type="color" value="${selectedElement.dataset.color || '#00ff88'}" onchange="updateProperty('color', this.value)">
+                        </div>
+                    `;
+                    break;
+                case 'icon':
+                    html += `
+                        <div class="property-group">
+                            <label>Icon</label>
+                            <input type="text" value="${selectedElement.dataset.icon || '🎯'}" onchange="updateProperty('icon', this.value)">
+                        </div>
+                        <div class="property-group">
+                            <label>Size</label>
+                            <input type="range" min="16" max="48" value="${selectedElement.dataset.size || '24'}" onchange="updateProperty('size', this.value)">
+                        </div>
+                    `;
+                    break;
+                case 'image':
+                    html += `
+                        <div class="property-group">
+                            <label>Source</label>
+                            <input type="text" value="${selectedElement.dataset.src || 'image.png'}" onchange="updateProperty('src', this.value)">
+                        </div>
+                        <div class="property-group">
+                            <label>Width</label>
+                            <input type="range" min="32" max="128" value="${selectedElement.dataset.width || '64'}" onchange="updateProperty('width', this.value)">
+                        </div>
+                        <div class="property-group">
+                            <label>Height</label>
+                            <input type="range" min="32" max="128" value="${selectedElement.dataset.height || '64'}" onchange="updateProperty('height', this.value)">
                         </div>
                     `;
                     break;
@@ -603,6 +958,9 @@
                         selectedElement.innerHTML = '<div class="progress-bar"></div>';
                     }
                     break;
+                case 'icon':
+                    selectedElement.innerHTML = value;
+                    break;
                 case 'color':
                     if (type === 'button') {
                         selectedElement.style.background = `linear-gradient(145deg, ${value}, ${adjustColor(value, -10)})`;
@@ -616,6 +974,16 @@
                     break;
                 case 'size':
                     selectedElement.style.fontSize = value + 'px';
+                    if (type === 'icon') {
+                        selectedElement.style.width = (parseInt(value) + 8) + 'px';
+                        selectedElement.style.height = (parseInt(value) + 8) + 'px';
+                    }
+                    break;
+                case 'width':
+                    selectedElement.style.width = value + 'px';
+                    break;
+                case 'height':
+                    selectedElement.style.height = value + 'px';
                     break;
                 case 'value':
                     if (type === 'slider') {
@@ -656,17 +1024,17 @@
             }
         }
 
-        function clearScreen() {
-            if (confirm('Clear all elements from the screen?')) {
-                document.getElementById('screenContent').innerHTML = '<div class="grid-overlay"></div>';
-                selectedElement = null;
-                document.getElementById('propertiesPanel').innerHTML = `
-                    <h2>⚙️ Properties</h2>
-                    <p style="color: #666; font-size: 12px;">Select an element to edit its properties</p>
-                `;
-                updateCodePreview();
-                showToast('Screen cleared!');
-            }
+        function clearScreen(showConfirm = true) {
+            if (showConfirm && !confirm('Clear all elements from the screen?')) return;
+            
+            document.getElementById('screenContent').innerHTML = '<div class="grid-overlay"></div>';
+            selectedElement = null;
+            document.getElementById('propertiesPanel').innerHTML = `
+                <h2>⚙️ Properties</h2>
+                <p style="color: #666; font-size: 12px;">Select an element to edit its properties</p>
+            `;
+            updateCodePreview();
+            if (showConfirm) showToast('Screen cleared!');
         }
 
         function toggleGrid() {
@@ -682,9 +1050,32 @@
             showToast('Preview mode activated');
         }
 
+        function randomLayout() {
+            const elements = document.querySelectorAll('.ui-element');
+            const screenContent = document.getElementById('screenContent');
+            
+            elements.forEach(el => {
+                const maxX = screenContent.clientWidth - el.offsetWidth;
+                const maxY = screenContent.clientHeight - el.offsetHeight;
+                const x = Math.random() * maxX;
+                const y = Math.random() * maxY;
+                
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+            });
+            
+            updateCodePreview();
+            showToast('Random layout applied!');
+        }
+
         function updateCodePreview() {
             const elements = document.querySelectorAll('.ui-element');
-            let code = `<span style="color: #569cd6;">// LilyGo TFT Display Code</span>
+            const config = currentDevice;
+            
+            let code = '';
+            
+            if (config.library === 'TFT_eSPI') {
+                code = `<span style="color: #569cd6;">// ${config.name} - TFT Display Code</span>
 <span style="color: #569cd6;">#include</span> <span style="color: #ce9178;">&lt;TFT_eSPI.h&gt;</span>
 
 <span style="color: #4fc1ff;">TFT_eSPI</span> tft = <span style="color: #4fc1ff;">TFT_eSPI</span>();
@@ -694,53 +1085,108 @@
   tft.<span style="color: #dcdcaa;">setRotation</span>(<span style="color: #b5cea8;">1</span>);
   tft.<span style="color: #dcdcaa;">fillScreen</span>(<span style="color: #4fc1ff;">TFT_BLACK</span>);
 `;
+            } else {
+                code = `<span style="color: #569cd6;">// ${config.name} - OLED Display Code</span>
+<span style="color: #569cd6;">#include</span> <span style="color: #ce9178;">&lt;U8g2lib.h&gt;</span>
+
+<span style="color: #4fc1ff;">U8G2_SSD1306_128X64_NONAME_F_HW_I2C</span> u8g2(<span style="color: #4fc1ff;">U8G2_R0</span>);
+
+<span style="color: #569cd6;">void</span> <span style="color: #dcdcaa;">setup</span>() {
+  u8g2.<span style="color: #dcdcaa;">begin</span>();
+  u8g2.<span style="color: #dcdcaa;">clearBuffer</span>();
+`;
+            }
 
             elements.forEach((el, index) => {
                 const type = el.className.split(' ').find(c => c.startsWith('ui-')).replace('ui-', '');
-                const x = parseInt(el.style.left);
-                const y = parseInt(el.style.top);
+                const x = Math.round(parseInt(el.style.left) * config.resolution.width / 400);
+                const y = Math.round(parseInt(el.style.top) * config.resolution.height / 300);
                 
-                switch(type) {
-                    case 'button':
-                        code += `
+                if (config.library === 'TFT_eSPI') {
+                    switch(type) {
+                        case 'button':
+                            code += `
   <span style="color: #6a9955;">// Button ${index + 1}</span>
   tft.<span style="color: #dcdcaa;">fillRoundRect</span>(<span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>, <span style="color: #b5cea8;">60</span>, <span style="color: #b5cea8;">30</span>, <span style="color: #b5cea8;">8</span>, <span style="color: #4fc1ff;">TFT_GREEN</span>);
   tft.<span style="color: #dcdcaa;">drawString</span>(<span style="color: #ce9178;">"${el.dataset.text || 'Button'}"</span>, <span style="color: #b5cea8;">${x + 10}</span>, <span style="color: #b5cea8;">${y + 10}</span>);`;
-                        break;
-                    case 'text':
-                        code += `
+                            break;
+                        case 'text':
+                            code += `
   <span style="color: #6a9955;">// Text ${index + 1}</span>
   tft.<span style="color: #dcdcaa;">drawString</span>(<span style="color: #ce9178;">"${el.dataset.text || 'Text'}"</span>, <span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>);`;
-                        break;
-                    case 'slider':
-                        code += `
+                            break;
+                        case 'slider':
+                            code += `
   <span style="color: #6a9955;">// Slider ${index + 1}</span>
   tft.<span style="color: #dcdcaa;">drawRoundRect</span>(<span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>, <span style="color: #b5cea8;">100</span>, <span style="color: #b5cea8;">20</span>, <span style="color: #b5cea8;">10</span>, <span style="color: #4fc1ff;">TFT_WHITE</span>);
-  tft.<span style="color: #dcdcaa;">fillCircle</span>(<span style="color: #b5cea8;">${x + parseInt(el.dataset.value || 50)}</span>, <span style="color: #b5cea8;">${y + 10}</span>, <span style="color: #b5cea8;">8</span>, <span style="color: #4fc1ff;">TFT_GREEN</span>);`;
-                        break;
-                    case 'progress':
-                        const progressWidth = parseInt(el.dataset.value || 60);
-                        code += `
+  tft.<span style="color: #dcdcaa;">fillCircle</span>(<span style="color: #b5cea8;">${x + Math.round(parseInt(el.dataset.value || 50) * 100 / 100)}</span>, <span style="color: #b5cea8;">${y + 10}</span>, <span style="color: #b5cea8;">8</span>, <span style="color: #4fc1ff;">TFT_GREEN</span>);`;
+                            break;
+                        case 'progress':
+                            const progressWidth = Math.round(parseInt(el.dataset.value || 60) * 80 / 100);
+                            code += `
   <span style="color: #6a9955;">// Progress Bar ${index + 1}</span>
   tft.<span style="color: #dcdcaa;">drawRect</span>(<span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>, <span style="color: #b5cea8;">80</span>, <span style="color: #b5cea8;">6</span>, <span style="color: #4fc1ff;">TFT_WHITE</span>);
-  tft.<span style="color: #dcdcaa;">fillRect</span>(<span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>, <span style="color: #b5cea8;">${Math.floor(80 * progressWidth / 100)}</span>, <span style="color: #b5cea8;">6</span>, <span style="color: #4fc1ff;">TFT_GREEN</span>);`;
-                        break;
+  tft.<span style="color: #dcdcaa;">fillRect</span>(<span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>, <span style="color: #b5cea8;">${progressWidth}</span>, <span style="color: #b5cea8;">6</span>, <span style="color: #4fc1ff;">TFT_GREEN</span>);`;
+                            break;
+                        case 'icon':
+                            code += `
+  <span style="color: #6a9955;">// Icon ${index + 1}</span>
+  tft.<span style="color: #dcdcaa;">drawString</span>(<span style="color: #ce9178;">"${el.dataset.icon || '🎯'}"</span>, <span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>);`;
+                            break;
+                        case 'image':
+                            code += `
+  <span style="color: #6a9955;">// Image ${index + 1}</span>
+  <span style="color: #6a9955;">// Load "${el.dataset.src}" and display at (${x}, ${y})</span>
+  tft.<span style="color: #dcdcaa;">drawRect</span>(<span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>, <span style="color: #b5cea8;">${el.dataset.width}</span>, <span style="color: #b5cea8;">${el.dataset.height}</span>, <span style="color: #4fc1ff;">TFT_WHITE</span>);`;
+                            break;
+                    }
+                } else {
+                    // U8g2 library code
+                    switch(type) {
+                        case 'button':
+                            code += `
+  <span style="color: #6a9955;">// Button ${index + 1}</span>
+  u8g2.<span style="color: #dcdcaa;">drawRFrame</span>(<span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>, <span style="color: #b5cea8;">60</span>, <span style="color: #b5cea8;">20</span>, <span style="color: #b5cea8;">4</span>);
+  u8g2.<span style="color: #dcdcaa;">drawStr</span>(<span style="color: #b5cea8;">${x + 10}</span>, <span style="color: #b5cea8;">${y + 15}</span>, <span style="color: #ce9178;">"${el.dataset.text || 'Button'}"</span>);`;
+                            break;
+                        case 'text':
+                            code += `
+  <span style="color: #6a9955;">// Text ${index + 1}</span>
+  u8g2.<span style="color: #dcdcaa;">drawStr</span>(<span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>, <span style="color: #ce9178;">"${el.dataset.text || 'Text'}"</span>);`;
+                            break;
+                    }
                 }
             });
 
-            code += `
+            if (config.library === 'TFT_eSPI') {
+                code += `
 }
 
 <span style="color: #569cd6;">void</span> <span style="color: #dcdcaa;">loop</span>() {
   <span style="color: #6a9955;">// Your main code here</span>
 }`;
+            } else {
+                code += `
+  u8g2.<span style="color: #dcdcaa;">sendBuffer</span>();
+}
 
-            document.getElementById('codePreview').innerHTML = code;
+<span style="color: #569cd6;">void</span> <span style="color: #dcdcaa;">loop</span>() {
+  <span style="color: #6a9955;">// Your main code here</span>
+}`;
+            }
+
+            document.getElementById('codeEditor').innerHTML = code;
         }
 
         function exportCode() {
             const elements = document.querySelectorAll('.ui-element');
-            let code = `#include <TFT_eSPI.h>
+            const config = currentDevice;
+            
+            let code = '';
+            
+            if (config.library === 'TFT_eSPI') {
+                code = `// ${config.name} - Generated UI Code
+#include <TFT_eSPI.h>
 
 TFT_eSPI tft = TFT_eSPI();
 
@@ -750,67 +1196,101 @@ void setup() {
   tft.fillScreen(TFT_BLACK);
   
 `;
+            } else {
+                code = `// ${config.name} - Generated UI Code
+#include <U8g2lib.h>
+
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
+
+void setup() {
+  u8g2.begin();
+  u8g2.clearBuffer();
+  
+`;
+            }
 
             elements.forEach((el, index) => {
                 const type = el.className.split(' ').find(c => c.startsWith('ui-')).replace('ui-', '');
-                const x = parseInt(el.style.left);
-                const y = parseInt(el.style.top);
+                const x = Math.round(parseInt(el.style.left) * config.resolution.width / 400);
+                const y = Math.round(parseInt(el.style.top) * config.resolution.height / 300);
                 
-                switch(type) {
-                    case 'button':
-                        code += `  // Button ${index + 1}
+                if (config.library === 'TFT_eSPI') {
+                    switch(type) {
+                        case 'button':
+                            code += `  // Button ${index + 1}
   tft.fillRoundRect(${x}, ${y}, 60, 30, 8, TFT_GREEN);
   tft.drawString("${el.dataset.text || 'Button'}", ${x + 10}, ${y + 10});
   
 `;
-                        break;
-                    case 'text':
-                        code += `  // Text ${index + 1}
+                            break;
+                        case 'text':
+                            code += `  // Text ${index + 1}
   tft.drawString("${el.dataset.text || 'Text'}", ${x}, ${y});
   
 `;
-                        break;
-                    case 'slider':
-                        code += `  // Slider ${index + 1}
+                            break;
+                        case 'slider':
+                            code += `  // Slider ${index + 1}
   tft.drawRoundRect(${x}, ${y}, 100, 20, 10, TFT_WHITE);
-  tft.fillCircle(${x + parseInt(el.dataset.value || 50)}, ${y + 10}, 8, TFT_GREEN);
+  tft.fillCircle(${x + Math.round(parseInt(el.dataset.value || 50) * 100 / 100)}, ${y + 10}, 8, TFT_GREEN);
   
 `;
-                        break;
-                    case 'progress':
-                        const progressWidth = parseInt(el.dataset.value || 60);
-                        code += `  // Progress Bar ${index + 1}
+                            break;
+                        case 'progress':
+                            const progressWidth = Math.round(parseInt(el.dataset.value || 60) * 80 / 100);
+                            code += `  // Progress Bar ${index + 1}
   tft.drawRect(${x}, ${y}, 80, 6, TFT_WHITE);
-  tft.fillRect(${x}, ${y}, ${Math.floor(80 * progressWidth / 100)}, 6, TFT_GREEN);
+  tft.fillRect(${x}, ${y}, ${progressWidth}, 6, TFT_GREEN);
   
 `;
-                        break;
+                            break;
+                    }
                 }
             });
 
-            code += `}
+            if (config.library === 'TFT_eSPI') {
+                code += `}
 
 void loop() {
   // Your main code here
 }`;
+            } else {
+                code += `  u8g2.sendBuffer();
+}
+
+void loop() {
+  // Your main code here
+}`;
+            }
 
             // Create and download file
             const blob = new Blob([code], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'lilygo_ui_code.ino';
+            a.download = `${currentDevice.type}_ui_code.ino`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showToast('Code exported as .ino file!');
+            showToast('Code exported as .ino file! 💾');
+        }
+
+        function copyCode() {
+            const codeText = document.getElementById('codeEditor').textContent;
+            navigator.clipboard.writeText(codeText).then(() => {
+                showToast('Code copied to clipboard! 📋');
+            });
+        }
+
+        function formatCode() {
+            updateCodePreview();
+            showToast('Code formatted! ✨');
         }
 
         // Initialize
-        updateCodePreview();
-        showToast('LilyGo UI Creator Ready! 🚀');
+        showToast('Welcome to LilyGo UI Creator! Choose a device to start! 🚀');
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
@@ -821,6 +1301,9 @@ void loop() {
             } else if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
                 exportCode();
+            } else if (e.key === 'Tab') {
+                e.preventDefault();
+                setMode(currentMode === 'block' ? 'code' : 'block');
             }
         });
     </script>
