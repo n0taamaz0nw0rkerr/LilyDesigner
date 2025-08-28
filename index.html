@@ -745,6 +745,12 @@
                     element.dataset.color = '#4CAF50';
                     break;
                 case 'text':
+                    let text = prompt("Text:", "Please enter text:");
+if (text == null || text == "") {
+  text = "User cancelled the prompt.";
+} else {
+  text = "Hello " + text + "! How are you today?";
+}
                     element.innerHTML = 'Text Label';
                     element.dataset.text = 'Text Label';
                     element.dataset.color = '#ffffff';
