@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LilyGo Device UI Creator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .device-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+        }
+
+        .lilygo-device {
+            width: 400px;
+            height: 300px;
+            background: linear-gradient(145deg, #2c3e50, #34495e);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 3px rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .device-screen {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #1a1a1a;
+        }
+
+        .screen-content {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            position: relative;
+            cursor: crosshair;
+        }
+
+        .ui-element {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .ui-element:hover {
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .ui-element.selected {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+        }
+
+        .ui-button {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            min-width: 60px;
+            min-height: 30px;
+        }
+
+        .ui-text {
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            min-width: 50px;
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .ui-slider {
+            width: 100px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .slider-thumb {
+            width: 16px;
+            height: 16px;
+            background: #00ff88;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: left 0.1s ease;
+        }
+
+        .ui-progress {
+            width: 80px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            border-radius: 3px;
+            width: 60%;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 18px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .element-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .element-item {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .element-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .element-item:active {
+            transform: translateY(0);
+        }
+
+        .properties-panel {
+            margin-top: 20px;
+        }
+
+        .property-group {
+            margin-bottom: 20px;
+        }
+
+        .property-group label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 500;
+            margin-bottom: 5px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .property-group input,
+        .property-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .property-group input:focus,
+        .property-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: linear-gradient(145deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-btn.export {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+        }
+
+        .control-btn.clear {
+            background: linear-gradient(145deg, #f44336, #d32f2f);
+        }
+
+        .device-info {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #00ff88;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .device-led {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px #00ff88;
+        }
+
+        .code-preview {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid #333;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>🎨 UI Elements</h2>
+            <div class="element-list">
+                <button class="element-item" onclick="addElement('button')">📱 Button</button>
+                <button class="element-item" onclick="addElement('text')">📝 Text</button>
+                <button class="element-item" onclick="addElement('slider')">🎚️ Slider</button>
+                <button class="element-item" onclick="addElement('progress')">📊 Progress Bar</button>
+            </div>
+
+            <div class="properties-panel" id="propertiesPanel">
+                <h2>⚙️ Properties</h2>
+                <p style="color: #666; font-size: 12px;">Select an element to edit its properties</p>
+            </div>
+
+            <div class="code-preview" id="codePreview">
+                <div style="color: #569cd6;">// Generated Code Preview</div>
+                <div style="color: #6a9955;">// Add elements to see generated code</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="device-container">
+                <div class="lilygo-device">
+                    <div class="device-info">LILYGO T-Display</div>
+                    <div class="device-led"></div>
+                    <div class="device-screen">
+                        <div class="screen-content" id="screenContent">
+                            <div class="grid-overlay"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="control-buttons">
+                    <button class="control-btn export" onclick="exportCode()">💾 Export Code</button>
+                    <button class="control-btn clear" onclick="clearScreen()">🗑️ Clear Screen</button>
+                    <button class="control-btn" onclick="toggleGrid()">⊞ Toggle Grid</button>
+                    <button class="control-btn" onclick="previewMode()">👁️ Preview</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let selectedElement = null;
+        let elementCounter = 0;
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        let gridVisible = true;
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function addElement(type) {
+            const screenContent = document.getElementById('screenContent');
+            const element = document.createElement('div');
+            element.className = `ui-element ui-${type}`;
+            element.id = `element_${++elementCounter}`;
+            
+            // Random position within screen bounds
+            const maxX = screenContent.clientWidth - 100;
+            const maxY = screenContent.clientHeight - 50;
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY;
+            
+            element.style.left = x + 'px';
+            element.style.top = y + 'px';
+
+            switch(type) {
+                case 'button':
+                    element.innerHTML = 'Button';
+                    element.dataset.text = 'Button';
+                    element.dataset.color = '#4CAF50';
+                    break;
+                case 'text':
+                    element.innerHTML = 'Text Label';
+                    element.dataset.text = 'Text Label';
+                    element.dataset.color = '#ffffff';
+                    element.dataset.size = '14';
+                    break;
+                case 'slider':
+                    element.innerHTML = '<div class="slider-thumb"></div>';
+                    element.dataset.value = '50';
+                    element.dataset.color = '#00ff88';
+                    break;
+                case 'progress':
+                    element.innerHTML = '<div class="progress-bar"></div>';
+                    element.dataset.value = '60';
+                    element.dataset.color = '#00ff88';
+                    break;
+            }
+
+            element.addEventListener('mousedown', startDrag);
+            element.addEventListener('click', selectElement);
+            
+            screenContent.appendChild(element);
+            selectElement({ target: element });
+            showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} added!`);
+            updateCodePreview();
+        }
+
+        function startDrag(e) {
+            if (e.target.classList.contains('ui-element')) {
+                isDragging = true;
+                selectedElement = e.target;
+                const rect = selectedElement.getBoundingClientRect();
+                const screenRect = document.getElementById('screenContent').getBoundingClientRect();
+                dragOffset.x = e.clientX - rect.left;
+                dragOffset.y = e.clientY - rect.top;
+                
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', stopDrag);
+                e.preventDefault();
+            }
+        }
+
+        function drag(e) {
+            if (isDragging && selectedElement) {
+                const screenRect = document.getElementById('screenContent').getBoundingClientRect();
+                let x = e.clientX - screenRect.left - dragOffset.x;
+                let y = e.clientY - screenRect.top - dragOffset.y;
+                
+                // Constrain to screen bounds
+                x = Math.max(0, Math.min(x, screenRect.width - selectedElement.offsetWidth));
+                y = Math.max(0, Math.min(y, screenRect.height - selectedElement.offsetHeight));
+                
+                selectedElement.style.left = x + 'px';
+                selectedElement.style.top = y + 'px';
+                updateCodePreview();
+            }
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        function selectElement(e) {
+            if (isDragging) return;
+            
+            // Remove previous selection
+            document.querySelectorAll('.ui-element').forEach(el => el.classList.remove('selected'));
+            
+            if (e.target.classList.contains('ui-element')) {
+                selectedElement = e.target;
+                selectedElement.classList.add('selected');
+                showProperties();
+            }
+        }
+
+        function showProperties() {
+            if (!selectedElement) return;
+            
+            const panel = document.getElementById('propertiesPanel');
+            const type = selectedElement.className.split(' ').find(c => c.startsWith('ui-')).replace('ui-', '');
+            
+            let html = `<h2>⚙️ Properties - ${type.toUpperCase()}</h2>`;
+            
+            switch(type) {
+                case 'button':
+                    html += `
+                        <div class="property-group">
+                            <label>Text</label>
+                            <input type="text" value="${selectedElement.dataset.text || 'Button'}" onchange="updateProperty('text', this.value)">
+                        </div>
+                        <div class="property-group">
+                            <label>Color</label>
+                            <input type="color" value="${selectedElement.dataset.color || '#4CAF50'}" onchange="updateProperty('color', this.value)">
+                        </div>
+                    `;
+                    break;
+                case 'text':
+                    html += `
+                        <div class="property-group">
+                            <label>Text</label>
+                            <input type="text" value="${selectedElement.dataset.text || 'Text Label'}" onchange="updateProperty('text', this.value)">
+                        </div>
+                        <div class="property-group">
+                            <label>Color</label>
+                            <input type="color" value="${selectedElement.dataset.color || '#ffffff'}" onchange="updateProperty('color', this.value)">
+                        </div>
+                        <div class="property-group">
+                            <label>Size</label>
+                            <input type="range" min="8" max="24" value="${selectedElement.dataset.size || '14'}" onchange="updateProperty('size', this.value)">
+                        </div>
+                    `;
+                    break;
+                case 'slider':
+                    html += `
+                        <div class="property-group">
+                            <label>Value (%)</label>
+                            <input type="range" min="0" max="100" value="${selectedElement.dataset.value || '50'}" onchange="updateProperty('value', this.value)">
+                        </div>
+                        <div class="property-group">
+                            <label>Color</label>
+                            <input type="color" value="${selectedElement.dataset.color || '#00ff88'}" onchange="updateProperty('color', this.value)">
+                        </div>
+                    `;
+                    break;
+                case 'progress':
+                    html += `
+                        <div class="property-group">
+                            <label>Progress (%)</label>
+                            <input type="range" min="0" max="100" value="${selectedElement.dataset.value || '60'}" onchange="updateProperty('value', this.value)">
+                        </div>
+                        <div class="property-group">
+                            <label>Color</label>
+                            <input type="color" value="${selectedElement.dataset.color || '#00ff88'}" onchange="updateProperty('color', this.value)">
+                        </div>
+                    `;
+                    break;
+            }
+            
+            html += `
+                <div class="property-group">
+                    <button class="control-btn clear" style="width: 100%; margin-top: 10px;" onclick="deleteElement()">🗑️ Delete Element</button>
+                </div>
+            `;
+            
+            panel.innerHTML = html;
+        }
+
+        function updateProperty(property, value) {
+            if (!selectedElement) return;
+            
+            selectedElement.dataset[property] = value;
+            const type = selectedElement.className.split(' ').find(c => c.startsWith('ui-')).replace('ui-', '');
+            
+            switch(property) {
+                case 'text':
+                    selectedElement.innerHTML = value;
+                    if (type === 'slider') {
+                        selectedElement.innerHTML = '<div class="slider-thumb"></div>';
+                    } else if (type === 'progress') {
+                        selectedElement.innerHTML = '<div class="progress-bar"></div>';
+                    }
+                    break;
+                case 'color':
+                    if (type === 'button') {
+                        selectedElement.style.background = `linear-gradient(145deg, ${value}, ${adjustColor(value, -10)})`;
+                    } else if (type === 'text') {
+                        selectedElement.style.color = value;
+                    } else if (type === 'slider') {
+                        selectedElement.querySelector('.slider-thumb').style.background = value;
+                    } else if (type === 'progress') {
+                        selectedElement.querySelector('.progress-bar').style.background = `linear-gradient(90deg, ${value}, ${adjustColor(value, -20)})`;
+                    }
+                    break;
+                case 'size':
+                    selectedElement.style.fontSize = value + 'px';
+                    break;
+                case 'value':
+                    if (type === 'slider') {
+                        const thumb = selectedElement.querySelector('.slider-thumb');
+                        const maxLeft = selectedElement.offsetWidth - thumb.offsetWidth - 4;
+                        thumb.style.left = (value / 100 * maxLeft + 2) + 'px';
+                    } else if (type === 'progress') {
+                        selectedElement.querySelector('.progress-bar').style.width = value + '%';
+                    }
+                    break;
+            }
+            updateCodePreview();
+        }
+
+        function adjustColor(color, amount) {
+            const usePound = color[0] === "#";
+            const col = usePound ? color.slice(1) : color;
+            const num = parseInt(col, 16);
+            let r = (num >> 16) + amount;
+            let g = (num >> 8 & 0x00FF) + amount;
+            let b = (num & 0x0000FF) + amount;
+            r = r > 255 ? 255 : r < 0 ? 0 : r;
+            g = g > 255 ? 255 : g < 0 ? 0 : g;
+            b = b > 255 ? 255 : b < 0 ? 0 : b;
+            return (usePound ? "#" : "") + (r << 16 | g << 8 | b).toString(16).padStart(6, '0');
+        }
+
+        function deleteElement() {
+            if (selectedElement) {
+                selectedElement.remove();
+                selectedElement = null;
+                document.getElementById('propertiesPanel').innerHTML = `
+                    <h2>⚙️ Properties</h2>
+                    <p style="color: #666; font-size: 12px;">Select an element to edit its properties</p>
+                `;
+                updateCodePreview();
+                showToast('Element deleted!');
+            }
+        }
+
+        function clearScreen() {
+            if (confirm('Clear all elements from the screen?')) {
+                document.getElementById('screenContent').innerHTML = '<div class="grid-overlay"></div>';
+                selectedElement = null;
+                document.getElementById('propertiesPanel').innerHTML = `
+                    <h2>⚙️ Properties</h2>
+                    <p style="color: #666; font-size: 12px;">Select an element to edit its properties</p>
+                `;
+                updateCodePreview();
+                showToast('Screen cleared!');
+            }
+        }
+
+        function toggleGrid() {
+            const grid = document.querySelector('.grid-overlay');
+            gridVisible = !gridVisible;
+            grid.style.display = gridVisible ? 'block' : 'none';
+            showToast(`Grid ${gridVisible ? 'enabled' : 'disabled'}`);
+        }
+
+        function previewMode() {
+            document.querySelectorAll('.ui-element').forEach(el => el.classList.remove('selected'));
+            selectedElement = null;
+            showToast('Preview mode activated');
+        }
+
+        function updateCodePreview() {
+            const elements = document.querySelectorAll('.ui-element');
+            let code = `<span style="color: #569cd6;">// LilyGo TFT Display Code</span>
+<span style="color: #569cd6;">#include</span> <span style="color: #ce9178;">&lt;TFT_eSPI.h&gt;</span>
+
+<span style="color: #4fc1ff;">TFT_eSPI</span> tft = <span style="color: #4fc1ff;">TFT_eSPI</span>();
+
+<span style="color: #569cd6;">void</span> <span style="color: #dcdcaa;">setup</span>() {
+  tft.<span style="color: #dcdcaa;">init</span>();
+  tft.<span style="color: #dcdcaa;">setRotation</span>(<span style="color: #b5cea8;">1</span>);
+  tft.<span style="color: #dcdcaa;">fillScreen</span>(<span style="color: #4fc1ff;">TFT_BLACK</span>);
+`;
+
+            elements.forEach((el, index) => {
+                const type = el.className.split(' ').find(c => c.startsWith('ui-')).replace('ui-', '');
+                const x = parseInt(el.style.left);
+                const y = parseInt(el.style.top);
+                
+                switch(type) {
+                    case 'button':
+                        code += `
+  <span style="color: #6a9955;">// Button ${index + 1}</span>
+  tft.<span style="color: #dcdcaa;">fillRoundRect</span>(<span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>, <span style="color: #b5cea8;">60</span>, <span style="color: #b5cea8;">30</span>, <span style="color: #b5cea8;">8</span>, <span style="color: #4fc1ff;">TFT_GREEN</span>);
+  tft.<span style="color: #dcdcaa;">drawString</span>(<span style="color: #ce9178;">"${el.dataset.text || 'Button'}"</span>, <span style="color: #b5cea8;">${x + 10}</span>, <span style="color: #b5cea8;">${y + 10}</span>);`;
+                        break;
+                    case 'text':
+                        code += `
+  <span style="color: #6a9955;">// Text ${index + 1}</span>
+  tft.<span style="color: #dcdcaa;">drawString</span>(<span style="color: #ce9178;">"${el.dataset.text || 'Text'}"</span>, <span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>);`;
+                        break;
+                    case 'slider':
+                        code += `
+  <span style="color: #6a9955;">// Slider ${index + 1}</span>
+  tft.<span style="color: #dcdcaa;">drawRoundRect</span>(<span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>, <span style="color: #b5cea8;">100</span>, <span style="color: #b5cea8;">20</span>, <span style="color: #b5cea8;">10</span>, <span style="color: #4fc1ff;">TFT_WHITE</span>);
+  tft.<span style="color: #dcdcaa;">fillCircle</span>(<span style="color: #b5cea8;">${x + parseInt(el.dataset.value || 50)}</span>, <span style="color: #b5cea8;">${y + 10}</span>, <span style="color: #b5cea8;">8</span>, <span style="color: #4fc1ff;">TFT_GREEN</span>);`;
+                        break;
+                    case 'progress':
+                        const progressWidth = parseInt(el.dataset.value || 60);
+                        code += `
+  <span style="color: #6a9955;">// Progress Bar ${index + 1}</span>
+  tft.<span style="color: #dcdcaa;">drawRect</span>(<span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>, <span style="color: #b5cea8;">80</span>, <span style="color: #b5cea8;">6</span>, <span style="color: #4fc1ff;">TFT_WHITE</span>);
+  tft.<span style="color: #dcdcaa;">fillRect</span>(<span style="color: #b5cea8;">${x}</span>, <span style="color: #b5cea8;">${y}</span>, <span style="color: #b5cea8;">${Math.floor(80 * progressWidth / 100)}</span>, <span style="color: #b5cea8;">6</span>, <span style="color: #4fc1ff;">TFT_GREEN</span>);`;
+                        break;
+                }
+            });
+
+            code += `
+}
+
+<span style="color: #569cd6;">void</span> <span style="color: #dcdcaa;">loop</span>() {
+  <span style="color: #6a9955;">// Your main code here</span>
+}`;
+
+            document.getElementById('codePreview').innerHTML = code;
+        }
+
+        function exportCode() {
+            const elements = document.querySelectorAll('.ui-element');
+            let code = `#include <TFT_eSPI.h>
+
+TFT_eSPI tft = TFT_eSPI();
+
+void setup() {
+  tft.init();
+  tft.setRotation(1);
+  tft.fillScreen(TFT_BLACK);
+  
+`;
+
+            elements.forEach((el, index) => {
+                const type = el.className.split(' ').find(c => c.startsWith('ui-')).replace('ui-', '');
+                const x = parseInt(el.style.left);
+                const y = parseInt(el.style.top);
+                
+                switch(type) {
+                    case 'button':
+                        code += `  // Button ${index + 1}
+  tft.fillRoundRect(${x}, ${y}, 60, 30, 8, TFT_GREEN);
+  tft.drawString("${el.dataset.text || 'Button'}", ${x + 10}, ${y + 10});
+  
+`;
+                        break;
+                    case 'text':
+                        code += `  // Text ${index + 1}
+  tft.drawString("${el.dataset.text || 'Text'}", ${x}, ${y});
+  
+`;
+                        break;
+                    case 'slider':
+                        code += `  // Slider ${index + 1}
+  tft.drawRoundRect(${x}, ${y}, 100, 20, 10, TFT_WHITE);
+  tft.fillCircle(${x + parseInt(el.dataset.value || 50)}, ${y + 10}, 8, TFT_GREEN);
+  
+`;
+                        break;
+                    case 'progress':
+                        const progressWidth = parseInt(el.dataset.value || 60);
+                        code += `  // Progress Bar ${index + 1}
+  tft.drawRect(${x}, ${y}, 80, 6, TFT_WHITE);
+  tft.fillRect(${x}, ${y}, ${Math.floor(80 * progressWidth / 100)}, 6, TFT_GREEN);
+  
+`;
+                        break;
+                }
+            });
+
+            code += `}
+
+void loop() {
+  // Your main code here
+}`;
+
+            // Create and download file
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'lilygo_ui_code.ino';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Code exported as .ino file!');
+        }
+
+        // Initialize
+        updateCodePreview();
+        showToast('LilyGo UI Creator Ready! 🚀');
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Delete' && selectedElement) {
+                deleteElement();
+            } else if (e.key === 'Escape') {
+                previewMode();
+            } else if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                exportCode();
+            }
+        });
+    </script>
+</body>
+</html>
